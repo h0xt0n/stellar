@@ -22,7 +22,6 @@
 *
 ***************************************************************************/
 
-
 import QtQuick 2.3
 import QtQuick.Layouts 1.2
 import QtQuick.Controls.Styles 1.4
@@ -64,137 +63,76 @@ Rectangle {
         anchors.fill: parent
         color: "transparent"
         visible: primaryScreen
-	
-	Rectangle {
-	    anchors.right: parent.right
-	    anchors.top: parent.top
-	    anchors.topMargin: 5
-	    z: 100
-	    width: 350
+        id: session
+    Rectangle {
+        anchors.centerIn: parent
+	width: Math.max(320, mainColumn.implicitWidth + 100)
+	height: mainColumn.implicitHeight + 50
+	opacity: 0.7
+	gradient: Gradient {
+            GradientStop { position: 0.0; color: "#1c1c1c" }
+            GradientStop { position: 1.0; color: "#000000" }
+        }
+	radius: 10
 
-            opacity: 0.7
-	    gradient: Gradient {
-                GradientStop { position: 0.0; color: "#1c1c1c" }
-                GradientStop { position: 1.0; color: "#000000" }
-            }
+        border.color: "transparent"
+        border.width: 0
 
-            border.color: "transparent"
-            border.width: 0
+        ColumnLayout {
+            id: mainColumn
+	    anchors.fill: parent
+	    anchors.margins: parent.width/20
 
-	    Row {
-                spacing: 4
-
-                ComboBox {
-                    id: session
-                    font.pixelSize: 14
-
-                    //arrowIcon: "angle-down.png"
-
-                    model: sessionModel
-                    index: sessionModel.lastIndex
+            TextBox {
+                id: name
+		height: 30
+		Layout.fillWidth: true
+                text: userModel.lastUser
+                font.pixelSize: 14
+		font.bold: true
+		textColor: "#ffffff"
+		color: "#000000"
+		opacity: 0.8
+		borderColor: "transparent"
+		radius: 10
 		    
-                    KeyNavigation.backtab: password; KeyNavigation.tab: layoutBox
-                }
-
-		LayoutBox {
-                    id: layoutBox
-                    font.pixelSize: 14
-
-                    //arrowIcon: "angle-down.png"
-
-                    KeyNavigation.backtab: session; KeyNavigation.tab: layoutBox
-                }
-                
-                Button {
-                    id: shutdownButton
-                    text: textConstants.shutdown
+		KeyNavigation.backtab: password; KeyNavigation.tab: password
 		    
-                    onClicked: sddm.powerOff()
-
-                    KeyNavigation.backtab: layoutBox; KeyNavigation.tab: rebootButton
-                }
-
-                Button {
-                    id: rebootButton
-                    text: textConstants.reboot
-
-                    onClicked: sddm.reboot()
-
-                    KeyNavigation.backtab: shutdownButton; KeyNavigation.tab: name
-                }
-            }
-	}
-
-        Rectangle {
-            anchors.centerIn: parent
-	    width: Math.max(320, mainColumn.implicitWidth + 100)
-	    height: mainColumn.implicitHeight + 50
-	    opacity: 0.7
-	    gradient: Gradient {
-                GradientStop { position: 0.0; color: "#1c1c1c" }
-                GradientStop { position: 1.0; color: "#000000" }
-            }
-	    radius: 10
-
-            border.color: "transparent"
-            border.width: 0
-
-            ColumnLayout {
-                id: mainColumn
-		anchors.fill: parent
-		anchors.margins: parent.width/20
-
-                TextBox {
-                    id: name
-		    height: 30
-		    Layout.fillWidth: true
-                    text: userModel.lastUser
-                    font.pixelSize: 14
-		    font.bold: true
-		    textColor: "#ffffff"
-		    color: "#000000"
-		    opacity: 0.8
-		    borderColor: "transparent"
-		    radius: 10
-		    
-		    KeyNavigation.backtab: rebootButton; KeyNavigation.tab: password
-		    
-		    Keys.onPressed: {
-		        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-			    sddm.login(name.text, password.text, session.index)
-			    event.accepted = true
-                        }
+		Keys.onPressed: {
+		    if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+			sddm.login(name.text, password.text, session.index)
+			event.accepted = true
                     }
                 }
+            }
 
-                PasswordBox {
-                    id: password
-		    Layout.fillWidth: true
-                    font.pixelSize: 14
-		    color: "#000000"
-		    textColor: "#ffffff"
-		    opacity: 0.8
-		    tooltipBG: "#1c1c1c"
-		    borderColor: "transparent"
-		    radius: 10
+            PasswordBox {
+                id: password
+		Layout.fillWidth: true
+                font.pixelSize: 14
+		color: "#000000"
+		textColor: "#ffffff"
+		opacity: 0.8
+		tooltipBG: "#1c1c1c"
+		borderColor: "transparent"
+		radius: 10
 		    
-		    KeyNavigation.backtab: name; KeyNavigation.tab: session
+		KeyNavigation.backtab: name; KeyNavigation.tab: name
 		    
-		    Keys.onPressed: {
-                        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                            sddm.login(name.text, password.text, session.index)
-                            event.accepted = true
-                        }
+		Keys.onPressed: {
+                    if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                        sddm.login(name.text, password.text, session.index)
+                        event.accepted = true
                     }
                 }
             }
         }
-    }
-
+    }	
     Component.onCompleted: {
         if (name.text == "")
             name.focus = true
         else
             password.focus = true
     }
+}
 }
